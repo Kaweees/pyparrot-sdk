@@ -1,0 +1,35 @@
+version = 1
+revision = 3
+requires-python = ">=3.9"
+
+[[package]]
+name = "defusedxml"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520, upload-time = "2021-03-08T10:59:26.269Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604, upload-time = "2021-03-08T10:59:24.45Z" },
+]
+
+[[package]]
+name = "pyparrot"
+version = "1.5.21"
+source = { editable = "." }
+dependencies = [
+    { name = "untangle" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "untangle" }]
+
+[[package]]
+name = "untangle"
+version = "1.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "defusedxml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a1/69/4fbd17bc16143343c022d845fd0fc2fc3bd89f85a5dce897cf00ad2c0e70/untangle-1.2.1.tar.gz", hash = "sha256:ae76522472722b31b303d5100c3c6f8b7dd4952b7b6c9d31e6d7b4a56f1a6d30", size = 4809, upload-time = "2022-07-02T14:09:30.67Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/4a/7f7857e04d5499af7c20b82b6bae13cb4ca7543aabcef06b4069a09462d9/untangle-1.2.1-py3-none-any.whl", hash = "sha256:1e783bb75996daf46ff7239ba049ee0eb54c056e235ac34809d74ea9e9898dd1", size = 4816, upload-time = "2022-07-02T14:09:28.861Z" },
+]
