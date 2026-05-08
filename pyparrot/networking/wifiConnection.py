@@ -334,7 +334,7 @@ class WifiConnection:
             json_string = json.dumps({"d2c_port":self.udp_receive_port,
                                       "controller_type":"computer",
                                       "controller_name":"pyparrot"})
-            
+
         json_obj = json.loads(json_string)
         print(json_string)
         try:
@@ -388,12 +388,12 @@ class WifiConnection:
         # https://github.com/N-Bz/bybop/blob/8d4c569c8e66bd1f0fdd768851409ca4b86c4ecd/src/Bybop_NetworkAL.py
         #self.udp_receive_sock.connect((self.drone_ip, self.udp_receive_port))
         self.udp_receive_sock.settimeout(5.0)
-        
+
         #Some computers having connection refused error (error was some kind of that, I dont remember actually)
         #These new setsockopt lines solving it (at least at my device)
         self.udp_receive_sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
         self.udp_send_sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-        
+
         self.udp_receive_sock.bind(('0.0.0.0', int(self.udp_receive_port)))
 
 
@@ -520,19 +520,19 @@ class WifiConnection:
 # TODO: This function could potentially be extended to encompass send_noparam_command_packet_ack
 # and send_enum_command_packet_ack if desired for more modular code.
 # TODO: The function could be improved by looking up the parameter data types in the xml files
-# in the same way the send_enum_command_packet_ack does. 
+# in the same way the send_enum_command_packet_ack does.
 
         # Create lists to store the number of bytes and pack chars needed for parameters
-        # Default them to zero so that if no params are provided the packet size is correct 
+        # Default them to zero so that if no params are provided the packet size is correct
         param_size_list = [0] * len(param_tuple)
         pack_char_list = [0] * len(param_tuple)
-        
+
         if param_tuple is not None:
             # Fetch the parameter sizes. By looping over the param_tuple we only get the data
             # for requested parameters so a mismatch in params and types does not matter
             for i,param in enumerate(param_tuple):
                 pack_char_list[i], param_size_list[i] = get_data_format_and_size(param, param_type_tuple[i])
-            
+
         if ack:
             ack_string = 'SEND_WITH_ACK'
             data_ack_string = 'DATA_WITH_ACK'
@@ -546,7 +546,7 @@ class WifiConnection:
         # Calculate packet size:
         # base packet <BBBIBBH is 11 bytes, param_size_list can be added up
         packet_size = 11 + sum(param_size_list)
-        
+
         packet = struct.pack("<BBBIBBH", self.data_types_by_name[data_ack_string],
                              self.buffer_ids[ack_string],
                              self.sequence_counter[ack_string], packet_size,
