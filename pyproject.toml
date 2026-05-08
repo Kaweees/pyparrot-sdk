@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "pyparrot-sdk"
-version = "1.5.22"
+version = "1.5.23"
 description = "Python interface to control Parrot drones"
 readme = "README.md"
 license = "MIT"
