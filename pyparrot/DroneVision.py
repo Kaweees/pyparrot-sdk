@@ -106,8 +106,8 @@ class DroneVision:
 
         if (self.cleanup_old_images):
             print("removing all the old images")
-            shutil.rmtree(self.imagePath)
-            os.mkdir(self.imagePath)
+            shutil.rmtree(self.imagePath, ignore_errors=True)
+            os.makedirs(self.imagePath, exist_ok=True)
 
         # the first step is to open the rtsp stream through ffmpeg first
         # this step creates a directory full of images, one per frame
