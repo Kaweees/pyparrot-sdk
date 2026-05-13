@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "pyparrot-sdk"
-version = "1.5.23"
+version = "1.5.24"
 description = "Python interface to control Parrot drones"
 readme = "README.md"
 license = "MIT"
@@ -24,7 +24,13 @@ classifiers = [
   "Topic :: Education",
   "Topic :: Software Development",
 ]
-dependencies = ["untangle"]
+dependencies = ["untangle", "zeroconf"]
+
+[project.optional-dependencies]
+vision = ["opencv-python-headless"]
+gui = ["PyQt5; platform_machine == 'x86_64'"]
+mambo = ["bluepy"]
+examples = ["pyparrot-sdk[vision,gui,mambo]", "pygame"]
 
 [project.scripts]
 find_mambo = "pyparrot.scripts.findMambo:main"
