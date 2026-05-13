@@ -40,7 +40,7 @@ def demo_anafi_user_vision(anafi_vision, args):
 
 
 if __name__ == "__main__":
-    anafi = Anafi()
+    anafi = Anafi(drone_type=Model.ANAFI, ip_address="192.168.42.1")
     print("Connecting to Anafi...")
 
     if anafi.connect(num_retries=3):

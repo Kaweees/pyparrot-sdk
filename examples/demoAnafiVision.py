@@ -22,7 +22,7 @@ class UserVision:
 
 
 if __name__ == "__main__":
-    anafi = Anafi()
+    anafi = Anafi(drone_type=Model.ANAFI, ip_address="192.168.42.1")
 
     if anafi.connect(num_retries=3):
         print("Anafi connected")
