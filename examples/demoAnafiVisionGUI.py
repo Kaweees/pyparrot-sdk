@@ -1,8 +1,7 @@
+import cv2
 from pyparrot.Anafi import Anafi
 from pyparrot.DroneVisionGUI import DroneVisionGUI
 from pyparrot.Model import Model
-import cv2
-
 
 WRITE_IMAGES = False
 
@@ -61,9 +60,7 @@ if __name__ == "__main__":
             user_args=(anafi,),
         )
         user_vision = UserVision(anafi_vision)
-        anafi_vision.set_user_callback_function(
-            user_vision.save_pictures, user_callback_args=None
-        )
+        anafi_vision.set_user_callback_function(user_vision.save_pictures, user_callback_args=None)
 
         print("Opening video stream")
         anafi_vision.open_video()

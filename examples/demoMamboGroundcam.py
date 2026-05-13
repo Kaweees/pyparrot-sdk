@@ -5,15 +5,15 @@ Author: Valentin Benke, https://github.com/Vabe7
 Author: Amy McGovern
 """
 
-from pyparrot.Minidrone import Mambo
 import cv2
+from pyparrot.Minidrone import Mambo
 
-mambo = Mambo(None, use_wifi=True) #address is None since it only works with WiFi anyway
+mambo = Mambo(None, use_wifi=True)  # address is None since it only works with WiFi anyway
 print("trying to connect to mambo now")
 success = mambo.connect(num_retries=3)
-print("connected: %s" % success)
+print(f"connected: {success}")
 
-if (success):
+if success:
     # get the state information
     print("sleeping")
     mambo.smart_sleep(1)
@@ -27,10 +27,12 @@ if (success):
     # need to wait a bit for the photo to show up
     mambo.smart_sleep(0.5)
 
-    picture_names = mambo.groundcam.get_groundcam_pictures_names() #get list of availible files
+    picture_names = mambo.groundcam.get_groundcam_pictures_names()  # get list of availible files
     print(picture_names)
 
-    frame = mambo.groundcam.get_groundcam_picture(picture_names[0],True) #get frame which is the first in the array
+    frame = mambo.groundcam.get_groundcam_picture(
+        picture_names[0], True
+    )  # get frame which is the first in the array
 
     if frame is not None:
         if frame is not False:

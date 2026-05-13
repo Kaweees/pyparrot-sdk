@@ -3,16 +3,15 @@ Demo of the ffmpeg based mambo vision code (basically flies around and saves out
 
 Author: Amy McGovern
 """
-from pyparrot.Minidrone import Mambo
-from pyparrot.DroneVision import DroneVision
-from pyparrot.Model import Model
-import threading
-import cv2
-import time
 
+import cv2
+from pyparrot.DroneVision import DroneVision
+from pyparrot.Minidrone import Mambo
+from pyparrot.Model import Model
 
 # set this to true if you want to fly for the demo
 testFlying = False
+
 
 class UserVision:
     def __init__(self, vision):
@@ -24,12 +23,11 @@ class UserVision:
 
         img = self.vision.get_latest_valid_picture()
 
-        if (img is not None):
+        if img is not None:
             filename = "test_image_%06d.png" % self.index
             cv2.imwrite(filename, img)
-            self.index +=1
-            #print(self.index)
-
+            self.index += 1
+            # print(self.index)
 
 
 # you will need to change this to the address of YOUR mambo
@@ -40,9 +38,9 @@ mamboAddr = "e0:14:d0:63:3d:d0"
 mambo = Mambo(mamboAddr, use_wifi=True)
 print("trying to connect to mambo now")
 success = mambo.connect(num_retries=3)
-print("connected: %s" % success)
+print(f"connected: {success}")
 
-if (success):
+if success:
     # get the state information
     print("sleeping")
     mambo.smart_sleep(1)
@@ -54,30 +52,30 @@ if (success):
     userVision = UserVision(mamboVision)
     mamboVision.set_user_callback_function(userVision.save_pictures, user_callback_args=None)
     success = mamboVision.open_video()
-    print("Success in opening vision is %s" % success)
+    print(f"Success in opening vision is {success}")
 
-    if (success):
+    if success:
         print("Vision successfully started!")
-        #removed the user call to this function (it now happens in open_video())
-        #mamboVision.start_video_buffering()
+        # removed the user call to this function (it now happens in open_video())
+        # mamboVision.start_video_buffering()
 
-        if (testFlying):
+        if testFlying:
             print("taking off!")
             mambo.safe_takeoff(5)
 
-            if (mambo.sensors.flying_state != "emergency"):
-                print("flying state is %s" % mambo.sensors.flying_state)
+            if mambo.sensors.flying_state != "emergency":
+                print(f"flying state is {mambo.sensors.flying_state}")
                 print("Flying direct: going up")
                 mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=20, duration=1)
 
                 print("flip left")
-                print("flying state is %s" % mambo.sensors.flying_state)
+                print(f"flying state is {mambo.sensors.flying_state}")
                 success = mambo.flip(direction="left")
-                print("mambo flip result %s" % success)
+                print(f"mambo flip result {success}")
                 mambo.smart_sleep(5)
 
             print("landing")
-            print("flying state is %s" % mambo.sensors.flying_state)
+            print(f"flying state is {mambo.sensors.flying_state}")
             mambo.safe_land(5)
         else:
             print("Sleeeping for 15 seconds - move the mambo around")

@@ -1,15 +1,13 @@
 """FFmpeg based vision demo for Parrot Anafi"""
-import threading
-import time
 
 import cv2
 from pyparrot.Anafi import Anafi
 from pyparrot.DroneVision import DroneVision
 from pyparrot.Model import Model
 
-
 # Set to True to output images
 WRITE_IMAGES = False
+
 
 class UserVision:
     def __init__(self, vision):
@@ -39,9 +37,7 @@ if __name__ == "__main__":
         print("Starting vision")
         anafi_vision = DroneVision(anafi, Model.ANAFI)
         user_vision = UserVision(anafi_vision)
-        anafi_vision.set_user_callback_function(
-            user_vision.save_pictures, user_callback_args=None
-        )
+        anafi_vision.set_user_callback_function(user_vision.save_pictures, user_callback_args=None)
 
         # Video feed
         if anafi_vision.open_video():

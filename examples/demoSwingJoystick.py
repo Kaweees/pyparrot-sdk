@@ -1,6 +1,8 @@
-import pygame
 import sys
+
+import pygame
 from pyparrot.Minidrone import Swing
+
 
 def joystick_init():
     """
@@ -61,13 +63,15 @@ def mapping_button(joystick, dict_commands):
     return mapping
 
 
-def mapping_axis(joystick, axes=["pitch", "roll", "yaw", "vertical"]):
+def mapping_axis(joystick, axes=None):
     """
     Associating the analog thumbsticks of the controller with a command in dict commands
 
     :param joystick, dict_commands:
     :return mapping:
     """
+    if axes is None:
+        axes = ["pitch", "roll", "yaw", "vertical"]
     mapping = {}
 
     for i in axes:
@@ -103,17 +107,17 @@ def _parse_button(dict_commands, button):
 
         else:
             command(arg)
-            dict_commands[button][-1] = args[1:]+[arg]
+            dict_commands[button][-1] = [*args[1:], arg]
 
     else:
         if len(commands) == 1:
             command(arg)
-            dict_commands[button][0] = commands[1:]+[command]
+            dict_commands[button][0] = [*commands[1:], command]
 
         else:
             command(arg)
-            dict_commands[button][0] = commands[1:]+[command]
-            dict_commands[button][-1] = args[1:]+[arg]
+            dict_commands[button][0] = [*commands[1:], command]
+            dict_commands[button][-1] = [*args[1:], arg]
 
 
 def main_loop(joystick, dict_commands, mapping_button, mapping_axis):
@@ -130,10 +134,10 @@ def main_loop(joystick, dict_commands, mapping_button, mapping_axis):
     while True:
         pygame.event.get()
 
-        pitch = joystick.get_axis(mapping_axis["pitch"])*-100
-        roll = joystick.get_axis(mapping_axis["roll"])*100
-        yaw = joystick.get_axis(mapping_axis["yaw"])*100
-        vertical = joystick.get_axis(mapping_axis["vertical"])*-100
+        pitch = joystick.get_axis(mapping_axis["pitch"]) * -100
+        roll = joystick.get_axis(mapping_axis["roll"]) * 100
+        yaw = joystick.get_axis(mapping_axis["yaw"]) * 100
+        vertical = joystick.get_axis(mapping_axis["vertical"]) * -100
 
         swing.fly_direct(roll, pitch, yaw, vertical, 0.1)
 
@@ -145,25 +149,40 @@ def main_loop(joystick, dict_commands, mapping_button, mapping_axis):
 if __name__ == "__main__":
     swing = Swing("e0:14:04:a7:3d:cb")
 
-    #Example of dict_commands
+    # Example of dict_commands
     dict_commands = {
-                        "takeoff_landing":[ #Name of the button
-                                            [swing.safe_takeoff, swing.safe_land],#Commands execute one by one
-                                            [5]#Argument for executing the function
-                                           ],
-                        "fly_mode":[
-                                    [swing.set_flying_mode],
-                                    ["quadricopter", "plane_forward"]
-                                   ],
-                        "plane_gear_box_up":[
-                                             [swing.set_plane_gear_box],
-                                             [((swing.sensors.plane_gear_box[:-1]+str(int(swing.sensors.plane_gear_box[-1])+1)) if swing.sensors.plane_gear_box[-1] != "3" else "gear_3")]#"gear_1" => "gear_2" => "gear_3"
-                                            ],
-                        "plane_gear_box_down":[
-                                               [swing.set_plane_gear_box],
-                                               [((swing.sensors.plane_gear_box[:-1]+str(int(swing.sensors.plane_gear_box[-1])-1)) if swing.sensors.plane_gear_box[-1] != "1" else "gear_1")]#"gear_3" => "gear_2" => "gear_1"
-                                            ]
-                    }
+        "takeoff_landing": [  # Name of the button
+            [swing.safe_takeoff, swing.safe_land],  # Commands execute one by one
+            [5],  # Argument for executing the function
+        ],
+        "fly_mode": [[swing.set_flying_mode], ["quadricopter", "plane_forward"]],
+        "plane_gear_box_up": [
+            [swing.set_plane_gear_box],
+            [
+                (
+                    (
+                        swing.sensors.plane_gear_box[:-1]
+                        + str(int(swing.sensors.plane_gear_box[-1]) + 1)
+                    )
+                    if swing.sensors.plane_gear_box[-1] != "3"
+                    else "gear_3"
+                )
+            ],  # "gear_1" => "gear_2" => "gear_3"
+        ],
+        "plane_gear_box_down": [
+            [swing.set_plane_gear_box],
+            [
+                (
+                    (
+                        swing.sensors.plane_gear_box[:-1]
+                        + str(int(swing.sensors.plane_gear_box[-1]) - 1)
+                    )
+                    if swing.sensors.plane_gear_box[-1] != "1"
+                    else "gear_1"
+                )
+            ],  # "gear_3" => "gear_2" => "gear_1"
+        ],
+    }
 
     joystick = joystick_init()
 

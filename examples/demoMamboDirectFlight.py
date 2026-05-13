@@ -15,9 +15,9 @@ mambo = Mambo(mamboAddr, use_wifi=True)
 
 print("trying to connect")
 success = mambo.connect(num_retries=3)
-print("connected: %s" % success)
+print(f"connected: {success}")
 
-if (success):
+if success:
     # get the state information
     print("sleeping")
     mambo.smart_sleep(2)
@@ -48,7 +48,9 @@ if (success):
     print("Flying direct: going up")
     mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=50, duration=1)
 
-    print("Flying direct: going around in a circle (yes you can mix roll, pitch, yaw in one command!)")
+    print(
+        "Flying direct: going around in a circle (yes you can mix roll, pitch, yaw in one command!)"
+    )
     mambo.fly_direct(roll=25, pitch=0, yaw=50, vertical_movement=0, duration=3)
 
     print("landing")

@@ -15,7 +15,7 @@ mambo = Mambo(mamboAddr, use_wifi=False)
 
 print("trying to connect")
 success = mambo.connect(num_retries=3)
-print("connected: %s" % success)
+print(f"connected: {success}")
 
 # get the state information
 print("sleeping")

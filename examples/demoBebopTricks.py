@@ -5,8 +5,9 @@ Author: Amy McGovern
 """
 
 from pyparrot.Bebop import Bebop
+from pyparrot.Model import Model
 
-bebop = Bebop()
+bebop = Bebop(drone_type=Model.BEBOP)
 
 print("connecting")
 success = bebop.connect(10)
@@ -20,27 +21,27 @@ bebop.ask_for_state_update()
 bebop.safe_takeoff(10)
 
 print("flip left")
-print("flying state is %s" % bebop.sensors.flying_state)
+print(f"flying state is {bebop.sensors.flying_state}")
 success = bebop.flip(direction="left")
-print("mambo flip result %s" % success)
+print(f"mambo flip result {success}")
 bebop.smart_sleep(5)
 
 print("flip right")
-print("flying state is %s" % bebop.sensors.flying_state)
+print(f"flying state is {bebop.sensors.flying_state}")
 success = bebop.flip(direction="right")
-print("mambo flip result %s" % success)
+print(f"mambo flip result {success}")
 bebop.smart_sleep(5)
 
 print("flip front")
-print("flying state is %s" % bebop.sensors.flying_state)
+print(f"flying state is {bebop.sensors.flying_state}")
 success = bebop.flip(direction="front")
-print("mambo flip result %s" % success)
+print(f"mambo flip result {success}")
 bebop.smart_sleep(5)
 
 print("flip back")
-print("flying state is %s" % bebop.sensors.flying_state)
+print(f"flying state is {bebop.sensors.flying_state}")
 success = bebop.flip(direction="back")
-print("mambo flip result %s" % success)
+print(f"mambo flip result {success}")
 bebop.smart_sleep(5)
 
 bebop.smart_sleep(5)

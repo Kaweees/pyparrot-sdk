@@ -16,9 +16,9 @@ mambo = Mambo(mamboAddr, use_wifi=True)
 
 print("trying to connect")
 success = mambo.connect(num_retries=3)
-print("connected: %s" % success)
+print(f"connected: {success}")
 
-if (success):
+if success:
     # get the state information
     print("sleeping")
     mambo.smart_sleep(2)
@@ -28,37 +28,37 @@ if (success):
     print("taking off!")
     mambo.safe_takeoff(5)
 
-    if (mambo.sensors.flying_state != "emergency"):
-        print("flying state is %s" % mambo.sensors.flying_state)
+    if mambo.sensors.flying_state != "emergency":
+        print(f"flying state is {mambo.sensors.flying_state}")
         print("Flying direct: going up")
         mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=20, duration=1)
 
         print("flip left")
-        print("flying state is %s" % mambo.sensors.flying_state)
+        print(f"flying state is {mambo.sensors.flying_state}")
         success = mambo.flip(direction="left")
-        print("mambo flip result %s" % success)
+        print(f"mambo flip result {success}")
         mambo.smart_sleep(5)
 
         print("flip right")
-        print("flying state is %s" % mambo.sensors.flying_state)
+        print(f"flying state is {mambo.sensors.flying_state}")
         success = mambo.flip(direction="right")
-        print("mambo flip result %s" % success)
+        print(f"mambo flip result {success}")
         mambo.smart_sleep(5)
 
         print("flip front")
-        print("flying state is %s" % mambo.sensors.flying_state)
+        print(f"flying state is {mambo.sensors.flying_state}")
         success = mambo.flip(direction="front")
-        print("mambo flip result %s" % success)
+        print(f"mambo flip result {success}")
         mambo.smart_sleep(5)
 
         print("flip back")
-        print("flying state is %s" % mambo.sensors.flying_state)
+        print(f"flying state is {mambo.sensors.flying_state}")
         success = mambo.flip(direction="back")
-        print("mambo flip result %s" % success)
+        print(f"mambo flip result {success}")
         mambo.smart_sleep(5)
 
         print("landing")
-        print("flying state is %s" % mambo.sensors.flying_state)
+        print(f"flying state is {mambo.sensors.flying_state}")
         mambo.safe_land(5)
         mambo.smart_sleep(5)
 

@@ -5,16 +5,16 @@ multi-threaded approach than DroneVision
 
 Author: Amy McGovern
 """
-from pyparrot.Minidrone import Mambo
-from pyparrot.DroneVisionGUI import DroneVisionGUI
-from pyparrot.Model import Model
-import cv2
-import time
 
+import cv2
+from pyparrot.DroneVisionGUI import DroneVisionGUI
+from pyparrot.Minidrone import Mambo
+from pyparrot.Model import Model
 
 # set this to true if you want to fly for the demo
 testFlying = True
 font = cv2.FONT_HERSHEY_SIMPLEX
+
 
 def draw_second_pictures(args):
     """
@@ -32,12 +32,13 @@ def draw_second_pictures(args):
     img = mamboVision.get_latest_valid_picture()
 
     # if the images is invalid, return
-    if(img is None):
+    if img is None:
         return
 
     # put the roll and pitch at the top of the screen
-    cv2.putText(img, 'demo text', (50, 50), font, 1, (255, 0, 255), 2, cv2.LINE_AA)
+    cv2.putText(img, "demo text", (50, 50), font, 1, (255, 0, 255), 2, cv2.LINE_AA)
     cv2.imshow("MarkerStream", img)
+
 
 def demo_mambo_user_vision_function(mamboVision, args):
     """
@@ -48,23 +49,23 @@ def demo_mambo_user_vision_function(mamboVision, args):
     """
     mambo = args[0]
 
-    if (testFlying):
+    if testFlying:
         print("taking off!")
         mambo.safe_takeoff(5)
 
-        if (mambo.sensors.flying_state != "emergency"):
-            print("flying state is %s" % mambo.sensors.flying_state)
+        if mambo.sensors.flying_state != "emergency":
+            print(f"flying state is {mambo.sensors.flying_state}")
             print("Flying direct: going up")
             mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=15, duration=2)
 
             print("flip left")
-            print("flying state is %s" % mambo.sensors.flying_state)
+            print(f"flying state is {mambo.sensors.flying_state}")
             success = mambo.flip(direction="left")
-            print("mambo flip result %s" % success)
+            print(f"mambo flip result {success}")
             mambo.smart_sleep(5)
 
         print("landing")
-        print("flying state is %s" % mambo.sensors.flying_state)
+        print(f"flying state is {mambo.sensors.flying_state}")
         mambo.safe_land(5)
     else:
         print("Sleeeping for 15 seconds - move the mambo around")
@@ -88,9 +89,9 @@ if __name__ == "__main__":
     print("trying to connect to mambo now")
 
     success = mambo.connect(num_retries=3)
-    print("connected: %s" % success)
+    print(f"connected: {success}")
 
-    if (success):
+    if success:
         # get the state information
         print("sleeping")
         mambo.smart_sleep(1)
@@ -101,8 +102,15 @@ if __name__ == "__main__":
         cv2.namedWindow("ExampleWindow")
 
         print("Preparing to open vision")
-        mamboVision = DroneVisionGUI(mambo, Model.MAMBO, buffer_size=200,
-                                     user_code_to_run=demo_mambo_user_vision_function, user_args=(mambo, ))
+        mamboVision = DroneVisionGUI(
+            mambo,
+            Model.MAMBO,
+            buffer_size=200,
+            user_code_to_run=demo_mambo_user_vision_function,
+            user_args=(mambo,),
+        )
 
-        mamboVision.set_user_callback_function(draw_second_pictures, user_callback_args=(mamboVision, ))
+        mamboVision.set_user_callback_function(
+            draw_second_pictures, user_callback_args=(mamboVision,)
+        )
         mamboVision.open_video()

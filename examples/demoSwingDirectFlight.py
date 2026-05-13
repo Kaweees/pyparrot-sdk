@@ -14,9 +14,9 @@ swing = Swing(swingAddr)
 
 print("trying to connect")
 success = swing.connect(num_retries=3)
-print("connected: %s" % success)
+print(f"connected: {success}")
 
-if (success):
+if success:
     # get the state information
     print("sleeping")
     swing.smart_sleep(2)

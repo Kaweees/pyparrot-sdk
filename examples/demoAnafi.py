@@ -1,5 +1,7 @@
 from pyparrot.Anafi import Anafi
-anafi = Anafi(drone_type="Anafi", ip_address="192.168.42.1")
+from pyparrot.Model import Model
+
+anafi = Anafi(drone_type=Model.ANAFI, ip_address="192.168.42.1")
 print("connecting")
 success = anafi.connect(10)
 print(success)
@@ -9,7 +11,7 @@ print("taking off")
 anafi.safe_takeoff(5)
 anafi.smart_sleep(1)
 print("moving")
-anafi.move_relative(dx=1,dy=0,dz=0,dradians=0)
+anafi.move_relative(dx=1, dy=0, dz=0, dradians=0)
 print("landing")
 anafi.safe_land(5)
 print("DONE - disconnecting")
