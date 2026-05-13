@@ -10,8 +10,23 @@ Anyone can use it who is interested in autonomous drone programming!
 
 Extensive documentation is available at [https://pyparrot.readthedocs.io](https://pyparrot.readthedocs.io)
 
+## Setup
+
+```sh
+uv sync                  # Anafi / Bebop (wifi)
+uv sync --extra vision   # + DroneVision GUI
+uv sync --extra mambo    # + Mambo / Swing (BLE, Linux only)
+```
+
+Mambo BLE additionally requires:
+
+```sh
+sudo apt install libglib2.0-dev libbluetooth-dev bluez build-essential
+sudo setcap 'cap_net_raw,cap_net_admin+eip' $(find .venv -name bluepy-helper -print -quit)
+```
+
 # Major updates and releases:
-* 10/16/2019: Version 1.5.21: Several fixes submitted by users merged into the main branch.  
+* 10/16/2019: Version 1.5.21: Several fixes submitted by users merged into the main branch.
 * 07/05/2019: Version 1.5.20: One more fix to the new DroneVisionGUI to fix invalid image crashes
 * 06/20/2019: Version 1.5.19: Updated the new DroneVisionGUI to not segfault with invalid images
 * 06/20/2019: Version 1.5.18 Added the ability for DroneVisionGUI to have two windows, one for video and one for user images.  Note that the initial geometry isn't quite right but resizing the window makes it work.
@@ -60,14 +75,14 @@ Extensive documentation is available at [https://pyparrot.readthedocs.io](https:
 * 5/29/2018: Version 1.4.6 Accepted fixes for Bebop 1 compatibility
 * 5/28/2018: Version 1.4.5 Fixed imports for new pypi structure and added xml files to pypi.
 * 5/25/2018: Version 1.4.3. Uploaded to pypi so pyparrot can now be installed directory from pip.  Updated documentation for new vision.
-* 5/23/2018: Updated function (contributed) to download pictures from Mambo's downward facing camera. 
+* 5/23/2018: Updated function (contributed) to download pictures from Mambo's downward facing camera.
 * 3/25/2018: Added DroneVisionGUI which is a version of the vision that shows the video stream (for Bebop or Mambo) in real time.
 * 2/22/2018: Version 1.3.2.  Updated DroneVision to make the vision processing faster.  Interface changed to only have the user call open_vision and close_vision (and not start_video_buffering)
 * 2/10/2018: Version 1.3.1. Updated DroneVision to work on Windows.
 * 2/8/2018: Version 1.3. Vision is working for both the Mambo and Bebop in a general interface called DroneVision.  Major documenation updates as well.
 * 2/6/2018: Updated Mambo to add speed settings for tilt & vertical.  Needed for class.
 * 2/4/2018: Unofficial updates to add ffmpeg support to the vision (will make an official release with examples soon)
-* 12/09/2017: Version 1.2.  Mambo now gives estimated orientation using quaternions.  Bebop now streams vision, which is accessible via VLC or other video clients.  Coming soon: opencv hooks into the vision.  
+* 12/09/2017: Version 1.2.  Mambo now gives estimated orientation using quaternions.  Bebop now streams vision, which is accessible via VLC or other video clients.  Coming soon: opencv hooks into the vision.
 * 12/02/2017: Version 1.1.  Fixed sensors with multiple values for Mambo and Bebop.
 * 11/26/2017: Initial release, version 1.0.  Working wifi and BLE for Mambo, initial flight for Bebop.
 
