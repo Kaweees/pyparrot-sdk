@@ -5,6 +5,7 @@ since it knows what to do with it.
 import struct
 import untangle
 from pyparrot.utils.colorPrint import color_print
+from pyparrot.Model import Model
 import os
 from os.path import join
 
@@ -71,7 +72,7 @@ class DroneSensorParser:
 
         self.common_sensors = untangle.parse(join(dir_path, 'common.xml'))
 
-        if (drone_type == "Minidrone"):
+        if (drone_type is Model.MINIDRONE):
             self.drone_sensors = untangle.parse(join(dir_path, 'minidrone.xml'))
         else:
             self.drone_sensors = untangle.parse(join(dir_path, 'ardrone3.xml'))

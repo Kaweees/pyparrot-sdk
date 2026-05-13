@@ -5,6 +5,7 @@ data back from the drone
 Author: Amy McGovern, dramymcgovern@gmail.com
 """
 import time
+from pyparrot.Model import Model
 from pyparrot.networking.wifiConnection import WifiConnection
 from pyparrot.utils.colorPrint import color_print
 from pyparrot.commandsandsensors.DroneCommandParser import DroneCommandParser
@@ -158,7 +159,7 @@ class BebopSensors:
         return str
 
 class Bebop():
-    def __init__(self, drone_type="Bebop2", ip_address=None):
+    def __init__(self, drone_type=Model.BEBOP2, ip_address=None):
         """
         Create a new Bebop object.  Assumes you have connected to the Bebop's wifi
 
@@ -508,7 +509,7 @@ class Bebop():
         :param pan_degrees: pan degrees
         :return:
         """
-        if(self.drone_type == "Bebop2"):
+        if(self.drone_type is Model.BEBOP2):
             command_tuple = self.command_parser.get_command_tuple("ardrone3", "Camera", "OrientationV2")
 
             self.drone_connection.send_param_command_packet(command_tuple, param_tuple=[tilt_degrees, pan_degrees],

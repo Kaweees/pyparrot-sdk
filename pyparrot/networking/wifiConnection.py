@@ -13,6 +13,7 @@ import json
 from pyparrot.utils.colorPrint import color_print
 import struct
 import threading
+from pyparrot.Model import Model
 from pyparrot.commandsandsensors.DroneSensorParser import get_data_format_and_size
 
 class mDNSListener(object):
@@ -24,28 +25,31 @@ class mDNSListener(object):
     def __init__(self, wifi_connection):
         self.wifi_connection = wifi_connection
 
-    def remove_service(self, zeroconf, type, name):
+    def remove_service(self, zeroconf: Zeroconf, type: str, name: str):
         #print("Service %s removed" % (name,))
         pass
 
-    def add_service(self, zeroconf, type, name):
+    def add_service(self, zeroconf: Zeroconf, type: str, name: str):
         info = zeroconf.get_service_info(type, name)
         print("Service %s added, service info: %s" % (name, info))
         self.wifi_connection._connect_listener_called(info)
+
+    def update_service(self, zeroconf: Zeroconf, type: str, name: str) -> None:
+        pass
 
 
 
 class WifiConnection:
 
-    def __init__(self, drone, drone_type="Bebop2", ip_address=None):
+    def __init__(self, drone, drone_type: Model, ip_address=None):
         """
         Can be a connection to a Anafi, Bebop, Bebop2 or a Mambo right now
 
         :param type: type of drone to connect to
         """
         self.is_connected = False
-        if (drone_type not in ("Anafi", "Bebop", "Bebop2", "Mambo", "Disco")):
-            color_print("Error: only type Anafi Bebop Disco and Mambo are currently supported", "ERROR")
+        if (drone_type not in (Model.ANAFI, Model.BEBOP, Model.BEBOP2, Model.MAMBO, Model.DISCO)):
+            color_print("Error: only type Anafi, Bebop, Disco, and Mambo are currently supported", "ERROR")
             return
 
         self.drone = drone
@@ -56,26 +60,26 @@ class WifiConnection:
         self.is_listening = True  # for the UDP listener
         self.ip_address = ip_address
 
-        if (drone_type is "Bebop"):
+        if (drone_type is Model.BEBOP):
             self.mdns_address = "_arsdk-0901._udp.local."
             #Bebop video streaming
             self.stream_port = 55004
             self.stream_control_port = 55005
-        elif (drone_type is "Anafi"):
+        elif (drone_type is Model.ANAFI):
             self.mdns_address = "_arsdk-0914._udp.local."
             self.stream_port = 55004
             self.stream_control_port = 55005
-        elif (drone_type is "Bebop2"):
+        elif (drone_type is Model.BEBOP2):
             self.mdns_address = "_arsdk-090c._udp.local."
             #Bebop video streaming
             self.stream_port = 55004
             self.stream_control_port = 55005
-        elif (drone_type is "Disco"):
+        elif (drone_type is Model.DISCO):
             self.mdns_address = "_arsdk-090e._udp.local."
             #Bebop video streaming
             self.stream_port = 55004
             self.stream_control_port = 55005
-        elif (drone_type is "Mambo"):
+        elif (drone_type is Model.MAMBO):
             self.mdns_address = "_arsdk-090b._udp.local."
 
         # map of the data types by name (for outgoing packets)
@@ -143,7 +147,7 @@ class WifiConnection:
         :return: True if the connection succeeded and False otherwise
         """
 
-        if (self.ip_address is None) and ("Mambo" not in self.drone_type):
+        if (self.ip_address is None) and (self.drone_type is not Model.MAMBO):
             print("Setting up mDNS listener since this is not a Mambo")
             #parrot's latest mambo firmware (3.0.26 broke all of the mDNS services so this is (temporarily) commented
             #out but it is backwards compatible and will work with the hard-coded addresses for now.
@@ -310,7 +314,7 @@ class WifiConnection:
 
         # connect
         # handle the broken mambo firmware by hard-coding the port and IP address
-        if ("Mambo" in self.drone_type):
+        if (self.drone_type is Model.MAMBO):
             self.drone_ip = "192.168.99.3"
             tcp_sock.connect(("192.168.99.3", 44444))
         else:
@@ -323,7 +327,7 @@ class WifiConnection:
 
 
         # send the handshake information
-        if(self.drone_type in ("Anafi", "Bebop", "Bebop2", "Disco")):
+        if(self.drone_type in (Model.ANAFI, Model.BEBOP, Model.BEBOP2, Model.DISCO)):
             # For Bebop add video stream ports to the json request
             json_string = json.dumps({"d2c_port":self.udp_receive_port,
                                       "controller_type":"computer",
@@ -351,7 +355,7 @@ class WifiConnection:
         while (not finished and num_try < num_retries):
             data = tcp_sock.recv(4096).decode('utf-8')
             if (len(data) > 0):
-                if (self.drone_type == "Anafi"):
+                if (self.drone_type is Model.ANAFI):
                   my_data = data #data[0:-1]
                 else:
                   my_data = data[0:-1]

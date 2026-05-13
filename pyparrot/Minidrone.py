@@ -7,6 +7,7 @@ Author: Alexander Zach, https://github.com/alex-zach, groundcam support
 Author: Valentin Benke, https://github.com/Vabe7, groundcam support
 """
 import time
+from pyparrot.Model import Model
 from pyparrot.networking.wifiConnection import WifiConnection
 try:
     from pyparrot.networking.bleConnection import BLEConnection
@@ -320,7 +321,7 @@ class Minidrone:
         self.use_wifi = use_wifi
         self.groundcam = None
         if (use_wifi):
-            self.drone_connection = WifiConnection(self, drone_type="Mambo")
+            self.drone_connection = WifiConnection(self, drone_type=Model.MAMBO)
             # initialize groundcam
             self.groundcam = MamboGroundcam()
         else:
@@ -336,7 +337,7 @@ class Minidrone:
 
         # initialize the sensors and the parser
         self.sensors = MinidroneSensors()
-        self.sensor_parser = DroneSensorParser(drone_type="Minidrone")
+        self.sensor_parser = DroneSensorParser(drone_type=Model.MINIDRONE)
 
 
     def set_user_sensor_callback(self, function, args):

@@ -15,7 +15,7 @@ All of the functions preceeded with an underscore are intended to be internal fu
 Creating a Bebop object
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-``Bebop(drone_type="Bebop2")`` create a Bebop object with an optional drone_type argument that can be used to create
+``Bebop(drone_type=Model.BEBOP2)`` create a Bebop object with an optional drone_type argument that can be used to create
 a bebop one or bebop 2 object.  Default is Bebop 2.  Note, there is limited support for the original bebop since
 I do not own one for testing.
 
