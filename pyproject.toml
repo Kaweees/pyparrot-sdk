@@ -2,17 +2,21 @@
 requires = ["uv_build"]
 build-backend = "uv_build"
 
+[tool.uv.build-backend]
+module-name = "pyparrot"
+module-root = ""
+
 [project]
 name = "pyparrot-sdk"
 version = "1.5.25"
 description = "Python interface to control Parrot drones"
-readme = "README.md"
-license = "MIT"
-requires-python = ">=3.9"
 authors = [
   { name = "Amy McGovern", email = "dramymcgovern@gmail.com" },
   { name = "Miguel Villa Floran", email = "miguel.villafloran@gmail.com" },
 ]
+requires-python = ">=3.9"
+readme = "README.md"
+license = { file = "LICENSE" }
 keywords = ["python", "parrot", "drone", "education", "programming"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -24,6 +28,7 @@ classifiers = [
   "Topic :: Education",
   "Topic :: Software Development",
 ]
+
 dependencies = ["untangle", "zeroconf"]
 
 [project.optional-dependencies]
@@ -41,6 +46,5 @@ find_mambo = "pyparrot.scripts.findMambo:main"
 "Say Thanks!" = "https://saythanks.io/to/amymcgovern"
 "Source" = "https://github.com/amymcgovern/pyparrot/"
 
-[tool.uv.build-backend]
-module-name = "pyparrot"
-module-root = ""
+[dependency-groups]
+dev = ["pre-commit"]
