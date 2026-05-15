@@ -1,4 +1,5 @@
 import cv2
+
 from pyparrot.Anafi import Anafi
 from pyparrot.DroneVisionGUI import DroneVisionGUI
 from pyparrot.Model import Model

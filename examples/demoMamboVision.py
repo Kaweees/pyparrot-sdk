@@ -5,6 +5,7 @@ Author: Amy McGovern
 """
 
 import cv2
+
 from pyparrot.DroneVision import DroneVision
 from pyparrot.Minidrone import Mambo
 from pyparrot.Model import Model

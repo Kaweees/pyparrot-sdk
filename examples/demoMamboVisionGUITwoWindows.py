@@ -7,6 +7,7 @@ Author: Amy McGovern
 """
 
 import cv2
+
 from pyparrot.DroneVisionGUI import DroneVisionGUI
 from pyparrot.Minidrone import Mambo
 from pyparrot.Model import Model
@@ -110,7 +111,5 @@ if __name__ == "__main__":
             user_args=(mambo,),
         )
 
-        mamboVision.set_user_callback_function(
-            draw_second_pictures, user_callback_args=(mamboVision,)
-        )
+        mamboVision.set_user_callback_function(draw_second_pictures, user_callback_args=(mamboVision,))
         mamboVision.open_video()

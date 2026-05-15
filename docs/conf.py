@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # pyparrot documentation build configuration file, created by
 # sphinx-quickstart on Tue May 29 13:55:14 2018.
@@ -20,7 +18,7 @@
 import os
 import sys
 # the mock stuff was borrowed from hagelslag to help make things work on readthedocs
-from mock import Mock as MagicMock
+from unittest.mock import Mock as MagicMock
 
 class Mock(MagicMock):
     @classmethod
@@ -174,6 +172,3 @@ texinfo_documents = [
      author, 'pyparrot', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-

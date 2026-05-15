@@ -2,12 +2,16 @@
 Sensor parser class:  handles the XML parsing and gets the values but the actual data is stored with the drone itself
 since it knows what to do with it.
 """
-import struct
-import untangle
-from pyparrot.utils.colorPrint import color_print
-from pyparrot.Model import Model
+
 import os
+import struct
 from os.path import join
+
+import untangle
+
+from pyparrot.Model import Model
+from pyparrot.utils.colorPrint import color_print
+
 
 def get_data_format_and_size(data, data_type):
     """
@@ -70,16 +74,16 @@ class DroneSensorParser:
         path = os.path.abspath(__file__)
         dir_path = os.path.dirname(path)
 
-        self.common_sensors = untangle.parse(join(dir_path, 'common.xml'))
+        self.common_sensors = untangle.parse(join(dir_path, "common.xml"))
 
-        if (drone_type is Model.MINIDRONE):
-            self.drone_sensors = untangle.parse(join(dir_path, 'minidrone.xml'))
+        if drone_type is Model.MINIDRONE:
+            self.drone_sensors = untangle.parse(join(dir_path, "minidrone.xml"))
         else:
-            self.drone_sensors = untangle.parse(join(dir_path, 'ardrone3.xml'))
+            self.drone_sensors = untangle.parse(join(dir_path, "ardrone3.xml"))
 
         self.project_xmls = (self.drone_sensors, self.common_sensors)
 
-        self.sensor_tuple_cache = dict()
+        self.sensor_tuple_cache = {}
 
     def extract_sensor_values(self, data):
         """
@@ -88,17 +92,17 @@ class DroneSensorParser:
         :return: a list of tuples of (sensor name, sensor value, sensor enum, header_tuple)
         """
         sensor_list = []
-        #print("updating sensors with ")
+        # print("updating sensors with ")
         try:
             header_tuple = struct.unpack_from("<BBH", data)
-        except:
+        except struct.error:
             color_print("Error: tried to parse a bad sensor packet", "ERROR")
             return None
 
-        #print(header_tuple)
+        # print(header_tuple)
         (names, data_sizes) = self._parse_sensor_tuple(header_tuple)
-        #print("name of sensor is %s" % names)
-        #print("data size is %s" % data_sizes)
+        # print("name of sensor is %s" % names)
+        # print("data size is %s" % data_sizes)
 
         packet_offset = 4
         if names is not None:
@@ -108,7 +112,7 @@ class DroneSensorParser:
                     # figure out how to parse the data
                     (format_string, new_offset) = get_data_format_and_size(data[packet_offset:], data_size)
 
-                    if (new_offset == 0):
+                    if new_offset == 0:
                         # this is usually a boolean flag stating that values have changed so set the value to True
                         # and let it return the name
                         sensor_data = True
@@ -116,30 +120,30 @@ class DroneSensorParser:
                         # real data, parse it
                         sensor_data = struct.unpack_from(format_string, data, offset=packet_offset)
                         sensor_data = sensor_data[0]
-                        if (data_size == "string"):
+                        if data_size == "string":
                             packet_offset += len(sensor_data)
                         else:
                             packet_offset += new_offset
                 except Exception as e:
                     sensor_data = None
-                    #print(header_tuple)
+                    # print(header_tuple)
                     color_print("Error parsing data for sensor", "ERROR")
                     print(e)
                     print("name of sensor is %s" % names)
                     print("data size is %s" % data_sizes)
                     print(len(data))
-                    print(4*(idx+1))
+                    print(4 * (idx + 1))
 
-                #print("%s %s %s" % (name,idx,sensor_data))
-                #color_print("updating the sensor!", "NONE")
+                # print("%s %s %s" % (name,idx,sensor_data))
+                # color_print("updating the sensor!", "NONE")
                 sensor_list.append([name, sensor_data, self.sensor_tuple_cache, header_tuple])
 
             return sensor_list
 
         else:
-            #color_print("Could not find sensor in list - ignoring for now.  Packet info below.", "ERROR")
-            #print(header_tuple)
-            #print(names)
+            # color_print("Could not find sensor in list - ignoring for now.  Packet info below.", "ERROR")
+            # print(header_tuple)
+            # print(names)
             return None
 
     def _parse_sensor_tuple(self, sensor_tuple):
@@ -158,31 +162,31 @@ class DroneSensorParser:
             return self.sensor_tuple_cache[(project_id, myclass_id, cmd_id)]
 
         for project_xml in self.project_xmls:
-            #color_print("looking for project id %d in %s" % (project_id, project_xml))
-            if (project_id == int(project_xml.project['id'])):
-                #color_print("looking for myclass_id %d" % myclass_id)
+            # color_print("looking for project id %d in %s" % (project_id, project_xml))
+            if project_id == int(project_xml.project["id"]):
+                # color_print("looking for myclass_id %d" % myclass_id)
                 for c in project_xml.project.myclass:
-                    #color_print("looking for cmd_id %d" % cmd_id)
-                    if int(c['id']) == myclass_id:
+                    # color_print("looking for cmd_id %d" % cmd_id)
+                    if int(c["id"]) == myclass_id:
                         for cmd_child in c.cmd:
-                            if int(cmd_child['id']) == cmd_id:
-                                cmd_name = cmd_child['name']
-                                sensor_names = list()
-                                data_sizes = list()
+                            if int(cmd_child["id"]) == cmd_id:
+                                cmd_name = cmd_child["name"]
+                                sensor_names = []
+                                data_sizes = []
 
-                                if (hasattr(cmd_child, 'arg')):
+                                if hasattr(cmd_child, "arg"):
                                     for arg_child in cmd_child.arg:
-                                        sensor_name = cmd_name + "_" + arg_child['name']
-                                        data_size = arg_child['type']
+                                        sensor_name = cmd_name + "_" + arg_child["name"]
+                                        data_size = arg_child["type"]
 
                                         # special case, if it is an enum, need to add the enum mapping into the cache
-                                        if (data_size == 'enum'):
-                                            enum_names = list()
+                                        if data_size == "enum":
+                                            enum_names = []
                                             for eitem in arg_child.enum:
-                                                #color_print(eitem)
-                                                enum_names.append(eitem['name'])
+                                                # color_print(eitem)
+                                                enum_names.append(eitem["name"])
                                             self.sensor_tuple_cache[sensor_name, "enum"] = enum_names
-                                            #color_print("added to sensor cache %s" % enum_names)
+                                            # color_print("added to sensor cache %s" % enum_names)
 
                                         # save the name and sizes to a list
                                         sensor_names.append(sensor_name)
@@ -194,10 +198,8 @@ class DroneSensorParser:
                                     data_sizes.append(None)
 
                                 # cache the results
-                                self.sensor_tuple_cache[(project_id, myclass_id, cmd_id)] = (
-                                sensor_names, data_sizes)
+                                self.sensor_tuple_cache[(project_id, myclass_id, cmd_id)] = (sensor_names, data_sizes)
                                 return (sensor_names, data_sizes)
-
 
         # didn't find it, return an error
         # cache the results

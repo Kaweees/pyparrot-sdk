@@ -1,6 +1,7 @@
 """FFmpeg based vision demo for Parrot Anafi"""
 
 import cv2
+
 from pyparrot.Anafi import Anafi
 from pyparrot.DroneVision import DroneVision
 from pyparrot.Model import Model

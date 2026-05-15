@@ -5,11 +5,12 @@ a room with obstacles for navigation and search.
 Amy McGovern dramymcgovern@gmail.com
 """
 
-from tkinter import *
-import numpy as np
-from tkinter import filedialog
 import os
 import pickle
+from tkinter import Button, Canvas, Entry, Label, Menu, Tk, Toplevel, filedialog
+
+import numpy as np
+
 
 class DroneGUI:
     def __init__(self):
@@ -38,12 +39,12 @@ class DroneGUI:
         factor = 10 * self.scale_val
         lower_x = int(center_x / factor) * factor
         lower_y = int(center_y / factor) * factor
-        #print("lower x and y are ", lower_x, lower_y)
+        # print("lower x and y are ", lower_x, lower_y)
 
         # translate the click into the map
         map_x = int(center_x / self.factor)
         map_y = self.room_map.shape[1] - int(center_y / self.factor) - 1
-        #print("map x and y are ", map_x, map_y)
+        # print("map x and y are ", map_x, map_y)
 
         return (center_x, center_y, lower_x, lower_y, map_x, map_y)
 
@@ -54,14 +55,13 @@ class DroneGUI:
         :param event: the tkinter event
         :return: nothing
         """
-        (center_x, center_y, lower_x, lower_y, map_x, map_y) = self.translate_click(event)
+        (_center_x, _center_y, lower_x, lower_y, map_x, map_y) = self.translate_click(event)
 
-
-        if (self.room_map[map_x, map_y] == 0):
-            self.draw_obstacle(lower_x,lower_y, size=self.factor, color=self.obstacle_color, map_x=map_x, map_y=map_y)
+        if self.room_map[map_x, map_y] == 0:
+            self.draw_obstacle(lower_x, lower_y, size=self.factor, color=self.obstacle_color, map_x=map_x, map_y=map_y)
             self.room_map[map_x, map_y] = self.obstacle_id
         else:
-            #print("Deleting obstacle ", self.obstacle_ids[map_x, map_y])
+            # print("Deleting obstacle ", self.obstacle_ids[map_x, map_y])
             self.clear_obstacle(map_x, map_y)
             self.room_map[map_x, map_y] = 0
 
@@ -80,7 +80,6 @@ class DroneGUI:
 
         popup_menu.post(event.x, event.y)
 
-
     def draw_goal_click(self, event):
         """
         Draw a green box for a goal at button 1 clicks
@@ -88,7 +87,7 @@ class DroneGUI:
         :param event:
         :return:
         """
-        (center_x, center_y, lower_x, lower_y, map_x, map_y) = self.translate_click(event)
+        (_center_x, _center_y, lower_x, lower_y, map_x, map_y) = self.translate_click(event)
 
         # clear whatever was there
         self.clear_obstacle(map_x, map_y)
@@ -96,8 +95,7 @@ class DroneGUI:
 
         # and save the click into the map
         self.room_map[map_x, map_y] = self.goal_id
-        self.draw_obstacle(lower_x,lower_y, self.factor, color=self.goal_color, map_x=map_x, map_y=map_y)
-
+        self.draw_obstacle(lower_x, lower_y, self.factor, color=self.goal_color, map_x=map_x, map_y=map_y)
 
     def draw_start_click(self, event):
         """
@@ -106,7 +104,7 @@ class DroneGUI:
         :param event:
         :return:
         """
-        (center_x, center_y, lower_x, lower_y, map_x, map_y) = self.translate_click(event)
+        (_center_x, _center_y, lower_x, lower_y, map_x, map_y) = self.translate_click(event)
 
         # clear whatever was there
         self.clear_obstacle(map_x, map_y)
@@ -114,13 +112,12 @@ class DroneGUI:
 
         # and save the click into the map
         self.room_map[map_x, map_y] = self.start_id
-        self.draw_obstacle(lower_x,lower_y, self.factor, color=self.start_color, map_x=map_x, map_y=map_y)
-
+        self.draw_obstacle(lower_x, lower_y, self.factor, color=self.start_color, map_x=map_x, map_y=map_y)
 
     def draw_obstacle(self, x, y, size, color, map_x, map_y):
         # draw the rectangle
         obs_id = self.room_canvas.create_rectangle(x, y, x + size, y + size, fill=color)
-        #print("Obstacle id is ", obs_id)
+        # print("Obstacle id is ", obs_id)
         self.obstacle_ids[map_x, map_y] = obs_id
 
     def clear_obstacle(self, map_x, map_y):
@@ -131,7 +128,7 @@ class DroneGUI:
     def set_scale(self):
         try:
             self.scale_val = int(self.scale.get())
-        except:
+        except ValueError:
             self.scale_val = 1
 
         # set the factor used for drawing translations
@@ -153,10 +150,10 @@ class DroneGUI:
 
         # initialize the internal map
         self.room_map = np.zeros((int(length * 10), int(height * 10)))
-        self.obstacle_ids = np.zeros((int(length * 10), int(height * 10)), dtype='int')
+        self.obstacle_ids = np.zeros((int(length * 10), int(height * 10)), dtype="int")
         print(self.room_map.shape)
 
-        print("Length is %0.1f and height is %0.1f" % (length, height))
+        print(f"Length is {length:0.1f} and height is {height:0.1f}")
 
         self.set_scale()
         self.draw_room(length, height)
@@ -193,14 +190,14 @@ class DroneGUI:
         # vertical lines at an interval of "line_distance" pixel
         line_distance = 10 * self.scale_val
         for x in range(line_distance, canvas_width, line_distance):
-            if (x % (line_distance * 10) == 0):
+            if x % (line_distance * 10) == 0:
                 self.room_canvas.create_line(x, 0, x, canvas_height, fill="red", width=2)
             else:
                 self.room_canvas.create_line(x, 0, x, canvas_height, fill="black")
 
         # horizontal lines at an interval of "line_distance" pixel
         for y in range(line_distance, canvas_height, line_distance):
-            if (y % (line_distance * 10) == 0):
+            if y % (line_distance * 10) == 0:
                 self.room_canvas.create_line(0, y, canvas_width, y, fill="red", width=2)
             else:
                 self.room_canvas.create_line(0, y, canvas_width, y, fill="black")
@@ -216,18 +213,18 @@ class DroneGUI:
             y = ys[i]
             lower_x = x * factor
             lower_y = (self.room_map.shape[1] - y - 1) * factor
-            if (self.room_map[x, y] == 1):
+            if self.room_map[x, y] == 1:
                 self.draw_obstacle(lower_x, lower_y, factor, color="#7575a3", map_x=x, map_y=y)
-            elif (self.room_map[x, y] == 2):
+            elif self.room_map[x, y] == 2:
                 self.draw_obstacle(lower_x, lower_y, factor, color="red", map_x=x, map_y=y)
-            elif (self.room_map[x, y] == 3):
+            elif self.room_map[x, y] == 3:
                 self.draw_obstacle(lower_x, lower_y, factor, color="green", map_x=x, map_y=y)
 
     def draw_map_from_file(self):
         width = self.room_map.shape[1] / 10.0
-        length = self.room_map.shape[0] /10.0
-        #print("length and width of loaded room are ", length,width)
-        #print("Scale is ", self.scale_val)
+        length = self.room_map.shape[0] / 10.0
+        # print("length and width of loaded room are ", length,width)
+        # print("Scale is ", self.scale_val)
         self.draw_room(length, width)
 
     def open_file_menu(self):
@@ -235,15 +232,15 @@ class DroneGUI:
         Load a map from a file
         :return:
         """
-        filename = filedialog.askopenfilename(initialdir=os.getcwd(),
-                                              title="Select map file",
-                                              filetypes=(("map files", "*.map"), ("all files", "*.*")))
+        filename = filedialog.askopenfilename(
+            initialdir=os.getcwd(), title="Select map file", filetypes=(("map files", "*.map"), ("all files", "*.*"))
+        )
 
         fp = open(filename, "rb")
         self.scale_val = pickle.load(fp)
         self.room_map = pickle.load(fp)
-        #print("scale val is ", self.scale_val)
-        #print("room map is ", self.room_map)
+        # print("scale val is ", self.scale_val)
+        # print("room map is ", self.room_map)
         fp.close()
         self.draw_map_from_file()
 
@@ -252,15 +249,12 @@ class DroneGUI:
         Bring up a save file dialog and then save
         :return:
         """
-        filename = filedialog.asksaveasfile(initialdir=os.getcwd(),
-                                            title="Save map file",
-                                            defaultextension=".map")
+        filename = filedialog.asksaveasfile(initialdir=os.getcwd(), title="Save map file", defaultextension=".map")
         print("saving to ", filename.name)
         fp = open(filename.name, "wb")
         pickle.dump(self.scale_val, fp)
         pickle.dump(self.room_map, fp)
         fp.close()
-
 
     def about_menu(self):
         pass
@@ -287,7 +281,9 @@ class DroneGUI:
         helpmenu.add_command(label="About...", command=self.about_menu)
 
         # draw the request to create a new room
-        Label(self.root, text="Enter the size of the room you are flying in (decimals to tenths)").grid(row=0, columnspan=2)
+        Label(self.root, text="Enter the size of the room you are flying in (decimals to tenths)").grid(
+            row=0, columnspan=2
+        )
         Label(self.root, text="Length (x) (meters)").grid(row=1)
         Label(self.root, text="Height (y) (meters)").grid(row=2)
         Label(self.root, text="1 cm = _ pixels").grid(row=3)
@@ -303,17 +299,15 @@ class DroneGUI:
         self.scale.grid(row=3, column=1)
 
         # action buttons
-        Button(self.root, text='Quit', command=self.root.quit).grid(row=4, column=0, pady=4)
-        Button(self.root, text='Create room', command=self.create_room).grid(row=4, column=1, pady=4)
+        Button(self.root, text="Quit", command=self.root.quit).grid(row=4, column=0, pady=4)
+        Button(self.root, text="Create room", command=self.create_room).grid(row=4, column=1, pady=4)
 
     def go(self):
         """
         Start the main GUI loop
         :return:
         """
-        mainloop()
-
-
+        self.root.mainloop()
 
 
 if __name__ == "__main__":

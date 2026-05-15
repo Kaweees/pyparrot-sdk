@@ -419,7 +419,7 @@ You can see how to use the set_flying_mode command. I advise you to have enough 
 
        print("disconnect")
        swing.disconnect()
-       
+
 
 Demo joystick for Swing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

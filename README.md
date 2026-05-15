@@ -89,4 +89,3 @@ sudo setcap 'cap_net_raw,cap_net_admin+eip' $(find .venv -name bluepy-helper -pr
 # Programming and using your drones responsibly
 
 It is your job to program and use your drones responsibly!  We are not responsible for any losses or damages of your drones or injuries.  Please fly safely and obey all laws.
-

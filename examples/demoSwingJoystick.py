@@ -1,6 +1,7 @@
 import sys
 
 import pygame
+
 from pyparrot.Minidrone import Swing
 
 
@@ -160,10 +161,7 @@ if __name__ == "__main__":
             [swing.set_plane_gear_box],
             [
                 (
-                    (
-                        swing.sensors.plane_gear_box[:-1]
-                        + str(int(swing.sensors.plane_gear_box[-1]) + 1)
-                    )
+                    (swing.sensors.plane_gear_box[:-1] + str(int(swing.sensors.plane_gear_box[-1]) + 1))
                     if swing.sensors.plane_gear_box[-1] != "3"
                     else "gear_3"
                 )
@@ -173,10 +171,7 @@ if __name__ == "__main__":
             [swing.set_plane_gear_box],
             [
                 (
-                    (
-                        swing.sensors.plane_gear_box[:-1]
-                        + str(int(swing.sensors.plane_gear_box[-1]) - 1)
-                    )
+                    (swing.sensors.plane_gear_box[:-1] + str(int(swing.sensors.plane_gear_box[-1]) - 1))
                     if swing.sensors.plane_gear_box[-1] != "1"
                     else "gear_1"
                 )

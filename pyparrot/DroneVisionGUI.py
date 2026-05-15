@@ -14,21 +14,20 @@ Author: Amy McGovern, dramymcgovern@gmail.com
 Some of the LIBVLC code comes from
 Author: Valentin Benke, valentin.benke@aon.at
 """
+
 import inspect
 import sys
-import tempfile
 import time
 from functools import partial
 from os.path import join
 
 import cv2
+from PyQt5.QtCore import QThread, QTimer
+from PyQt5.QtGui import QColor, QPalette, QPixmap
+from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QMainWindow, QPushButton, QVBoxLayout, QWidget
+
 import pyparrot.utils.vlc as vlc
 from pyparrot.Model import Model
-from PyQt5.QtCore import Qt, QThread, QTimer
-from PyQt5.QtGui import QColor, QPalette, QPixmap
-from PyQt5.QtWidgets import (QAction, QApplication, QFileDialog, QFrame,
-                             QHBoxLayout, QLabel, QMainWindow, QPushButton,
-                             QSlider, QVBoxLayout, QWidget)
 
 
 class Player(QMainWindow):
@@ -59,6 +58,7 @@ class Player(QMainWindow):
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
     """
+
     def __init__(self, vlc_player, drone_gui):
         """
         Create a UI window for the VLC player
@@ -84,14 +84,14 @@ class Player(QMainWindow):
         self.setCentralWidget(self.widget)
 
         # In this widget, the video will be drawn
-        if sys.platform == "darwin": # for MacOS
+        if sys.platform == "darwin":  # for MacOS
             from PyQt5.QtWidgets import QMacCocoaViewContainer
+
             self.videoframe = QMacCocoaViewContainer(0)
         else:
             self.videoframe = QFrame()
         self.palette = self.videoframe.palette()
-        self.palette.setColor (QPalette.Window,
-                               QColor(0,0,0))
+        self.palette.setColor(QPalette.Window, QColor(0, 0, 0))
         self.videoframe.setPalette(self.palette)
         self.videoframe.setAutoFillBackground(True)
 
@@ -111,16 +111,16 @@ class Player(QMainWindow):
         self.vboxlayout = QVBoxLayout()
         self.vboxlayout.addWidget(self.videoframe)
 
-        if (self.drone_vision.user_draw_window_fn is not None):
+        if self.drone_vision.user_draw_window_fn is not None:
             self.userWindow = QLabel()
             fullPath = inspect.getfile(DroneVisionGUI)
             shortPathIndex = fullPath.rfind("/")
-            if (shortPathIndex == -1):
+            if shortPathIndex == -1:
                 # handle Windows paths
                 shortPathIndex = fullPath.rfind("\\")
             print(shortPathIndex)
             shortPath = fullPath[0:shortPathIndex]
-            pixmap = QPixmap('%s/demo_user_image.png' % shortPath)
+            pixmap = QPixmap("%s/demo_user_image.png" % shortPath)
             print(pixmap)
             print(pixmap.isNull())
             self.userWindow.setPixmap(pixmap)
@@ -135,16 +135,15 @@ class Player(QMainWindow):
         # this is platform specific!
         # you have to give the id of the QFrame (or similar object) to
         # vlc, different platforms have different functions for this
-        if sys.platform.startswith('linux'): # for Linux using the X Server
+        if sys.platform.startswith("linux"):  # for Linux using the X Server
             self.mediaplayer.set_xwindow(self.videoframe.winId())
-        elif sys.platform == "win32": # for Windows
+        elif sys.platform == "win32":  # for Windows
             self.mediaplayer.set_hwnd(self.videoframe.winId())
-        elif sys.platform == "darwin": # for MacOS
+        elif sys.platform == "darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
 
 
 class UserVisionProcessingThread(QThread):
-
     def __init__(self, user_vision_function, user_args, drone_vision):
         """
         :param user_vision_function: user callback function to handle vision
@@ -160,7 +159,7 @@ class UserVisionProcessingThread(QThread):
 
     def run(self):
         print("user callback being called")
-        while (self.drone_vision.vision_running):
+        while self.drone_vision.vision_running:
             self.user_vision_function(self.user_args)
 
             # put the thread back to sleep for fps
@@ -171,8 +170,8 @@ class UserVisionProcessingThread(QThread):
         print("exiting user vision thread")
         self.terminate()
 
-class UserWindowDrawThread(QThread):
 
+class UserWindowDrawThread(QThread):
     def __init__(self, user_draw_function, drone_vision):
         """
         :param user_draw_function: user drawing function that should return an image
@@ -185,11 +184,11 @@ class UserWindowDrawThread(QThread):
         self.wait()
 
     def run(self):
-        #print("user window draw thread being called")
-        while (self.drone_vision.vision_running):
+        # print("user window draw thread being called")
+        while self.drone_vision.vision_running:
             img = self.user_draw_function()
-            if(img is not None):
-                if (not img.isNull()):
+            if img is not None:
+                if not img.isNull():
                     self.drone_vision.vlc_gui.userWindow.setPixmap(QPixmap.fromImage(img))
 
             # put the thread back to sleep for fps
@@ -199,6 +198,7 @@ class UserWindowDrawThread(QThread):
         # exit when the vision thread ends
         print("exiting user window draw thread")
         self.terminate()
+
 
 class UserCodeToRun(QThread):
     def __init__(self, user_function, user_args, drone_vision):
@@ -219,7 +219,17 @@ class UserCodeToRun(QThread):
 
 
 class DroneVisionGUI:
-    def __init__(self, drone_object, model, user_code_to_run, user_args, buffer_size=200, network_caching=200, fps=20, user_draw_window_fn=None):
+    def __init__(
+        self,
+        drone_object,
+        model,
+        user_code_to_run,
+        user_args,
+        buffer_size=200,
+        network_caching=200,
+        fps=20,
+        user_draw_window_fn=None,
+    ):
         """
         Setup your vision object and initialize your buffers.  You won't start seeing pictures
         until you call open_video.
@@ -263,7 +273,7 @@ class DroneVisionGUI:
 
         # if we are drawing a special user window
         self.user_draw_window_fn = user_draw_window_fn
-        if (self.user_draw_window_fn is not None):
+        if self.user_draw_window_fn is not None:
             self.user_window_draw_thread = UserWindowDrawThread(self.user_draw_window_fn, self)
         else:
             self.user_window_draw_thread = None
@@ -282,7 +292,6 @@ class DroneVisionGUI:
         button.setEnabled(False)
         self.user_thread.start()
 
-
     def set_user_callback_function(self, user_callback_function=None, user_callback_args=None):
         """
         Set the (optional) user callback function for handling the new vision frames.  This is
@@ -293,7 +302,6 @@ class DroneVisionGUI:
         :return:
         """
         self.user_vision_thread = UserVisionProcessingThread(user_callback_function, user_callback_args, self)
-
 
     def open_video(self):
         """
@@ -315,7 +323,7 @@ class DroneVisionGUI:
         # get the path for the config files
         fullPath = inspect.getfile(DroneVisionGUI)
         shortPathIndex = fullPath.rfind("/")
-        if (shortPathIndex == -1):
+        if shortPathIndex == -1:
             # handle Windows paths
             shortPathIndex = fullPath.rfind("\\")
         print(shortPathIndex)
@@ -339,8 +347,7 @@ class DroneVisionGUI:
         self.player = vlc.MediaPlayer(self.stream_addr, ":network-caching=" + str(self.network_caching))
 
         # start the buffering
-        success = self._start_video_buffering()
-
+        self._start_video_buffering()
 
     def _start_video_buffering(self):
         """
@@ -357,11 +364,11 @@ class DroneVisionGUI:
         # ensure that closing the window closes vision
         app.aboutToQuit.connect(self.land_close_exit)
 
-        if (self.user_vision_thread is not None):
+        if self.user_vision_thread is not None:
             print("Starting user vision thread")
             self.user_vision_thread.start()
 
-        if (self.user_draw_window_fn is not None):
+        if self.user_draw_window_fn is not None:
             print("Starting user drawing thread")
             self.user_window_draw_thread.start()
 
@@ -378,7 +385,6 @@ class DroneVisionGUI:
         # start the GUI loop
         app.exec()
 
-
     def _buffer_vision(self):
         """
         Internal method to save valid video captures from the camera fps times a second
@@ -390,22 +396,22 @@ class DroneVisionGUI:
         self.new_frame = False
 
         # run forever, trying to grab the latest image
-        if (self.vision_running):
+        if self.vision_running:
             # generate a temporary file, gets deleted after usage automatically
-            #self.file = tempfile.NamedTemporaryFile(dir=self.imagePath)
+            # self.file = tempfile.NamedTemporaryFile(dir=self.imagePath)
             self.file = join(self.imagePath, "visionStream.jpg")
-            #self.file = tempfile.SpooledTemporaryFile(max_size=32768)
+            # self.file = tempfile.SpooledTemporaryFile(max_size=32768)
             # save the current picture from the stream
             self.player.video_take_snapshot(0, self.file, 0, 0)
             # read the picture into opencv
             img = cv2.imread(self.file)
 
             # sometimes cv2 returns a None object so skip putting those in the array
-            if (img is not None):
+            if img is not None:
                 # got a new image, save it to the buffer directly
                 self.buffer_index += 1
                 self.buffer_index %= self.buffer_size
-                #print video_frame
+                # print video_frame
                 self.buffer[self.buffer_index] = img
                 self.new_frame = True
 
@@ -427,7 +433,7 @@ class DroneVisionGUI:
         self.vlc_gui.destroy()
 
         # kill the threads
-        if (self.user_window_draw_thread is not None):
+        if self.user_window_draw_thread is not None:
             self.user_window_draw_thread.quit()
             self.user_vision_thread.quit()
             self.user_thread.quit()
@@ -455,12 +461,11 @@ class DroneVisionGUI:
 
         # land the drone
         if self.model is Model.BEBOP:
-            if (not self.drone_object.is_landed()):
+            if not self.drone_object.is_landed():
                 self.drone_object.emergency_land()
         else:
-            if (not self.drone_object.is_landed()):
+            if not self.drone_object.is_landed():
                 self.drone_object.safe_land(5)
-
 
     def close_video(self):
         """

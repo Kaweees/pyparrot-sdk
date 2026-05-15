@@ -490,6 +490,3 @@ This is optional and is shown in the code below.
 
             else:
                 print("Error connecting to bebop.  Retry")
-
-
-

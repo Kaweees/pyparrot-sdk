@@ -13,17 +13,20 @@ to use libvlc and DroneVisionGUI.
 
 Author: Amy McGovern, dramymcgovern@gmail.com
 """
-import cv2
+
+import inspect
+import os
+import shutil
+import subprocess
 import threading
 import time
-import subprocess
-import os
 from os.path import join
-import inspect
-from pyparrot.utils.NonBlockingStreamReader import NonBlockingStreamReader
+
+import cv2
+
 from pyparrot.Model import Model
-import shutil
-import signal
+from pyparrot.utils.NonBlockingStreamReader import NonBlockingStreamReader
+
 
 class DroneVision:
     def __init__(self, drone_object, model, buffer_size=200, cleanup_old_images=True):
@@ -47,15 +50,13 @@ class DroneVision:
         self.buffer_index = 0
 
         # setup the thread for monitoring the vision (but don't start it until we connect in open_video)
-        self.vision_thread = threading.Thread(target=self._buffer_vision,
-                                              args=(buffer_size, ))
+        self.vision_thread = threading.Thread(target=self._buffer_vision, args=(buffer_size,))
         self.user_vision_thread = None
         self.vision_running = True
 
         # the vision thread starts opencv on these files.  That will happen inside the other thread
         # so here we just sent the image index to 1 ( to start)
         self.image_index = 1
-
 
     def set_user_callback_function(self, user_callback_function=None, user_callback_args=None):
         """
@@ -66,9 +67,9 @@ class DroneVision:
         :param user_callback_args: arguments to the function
         :return:
         """
-        self.user_vision_thread = threading.Thread(target=self._user_callback,
-                                                   args=(user_callback_function, user_callback_args))
-
+        self.user_vision_thread = threading.Thread(
+            target=self._user_callback, args=(user_callback_function, user_callback_args)
+        )
 
     def open_video(self):
         """
@@ -94,7 +95,7 @@ class DroneVision:
         # get the path for the config files
         fullPath = inspect.getfile(DroneVision)
         shortPathIndex = fullPath.rfind("/")
-        if (shortPathIndex == -1):
+        if shortPathIndex == -1:
             # handle Windows paths
             shortPathIndex = fullPath.rfind("\\")
         print(shortPathIndex)
@@ -104,7 +105,7 @@ class DroneVision:
         print(self.imagePath)
         print(self.utilPath)
 
-        if (self.cleanup_old_images):
+        if self.cleanup_old_images:
             print("removing all the old images")
             shutil.rmtree(self.imagePath, ignore_errors=True)
             os.makedirs(self.imagePath, exist_ok=True)
@@ -113,18 +114,29 @@ class DroneVision:
         # this step creates a directory full of images, one per frame
         print("Opening ffmpeg")
         if self.model is Model.BEBOP:
-            cmdStr = "ffmpeg -protocol_whitelist \"file,rtp,udp\" -i %s/bebop.sdp -r 30 image_" % self.utilPath + "%03d.png"
+            cmdStr = (
+                'ffmpeg -protocol_whitelist "file,rtp,udp" -i %s/bebop.sdp -r 30 image_' % self.utilPath + "%03d.png"
+            )
             print(cmdStr)
-            self.ffmpeg_process = \
-                subprocess.Popen(cmdStr, shell=True, cwd=self.imagePath, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            self.ffmpeg_process = subprocess.Popen(
+                cmdStr, shell=True, cwd=self.imagePath, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+            )
         elif self.model is Model.MAMBO:
-            self.ffmpeg_process = \
-                subprocess.Popen("ffmpeg -i rtsp://192.168.99.1/media/stream2 -r 30 image_%03d.png",
-                               shell=True, cwd=self.imagePath, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            self.ffmpeg_process = subprocess.Popen(
+                "ffmpeg -i rtsp://192.168.99.1/media/stream2 -r 30 image_%03d.png",
+                shell=True,
+                cwd=self.imagePath,
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            )
         elif self.model is Model.ANAFI:
-            self.ffmpeg_process = \
-                subprocess.Popen("ffmpeg -i rtsp://192.168.42.1/live -r 30 image_%03d.png",
-                               shell=True, cwd=self.imagePath, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            self.ffmpeg_process = subprocess.Popen(
+                "ffmpeg -i rtsp://192.168.42.1/live -r 30 image_%03d.png",
+                shell=True,
+                cwd=self.imagePath,
+                stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            )
 
         # immediately start the vision buffering (before we even know if it succeeded since waiting puts us behind)
         self._start_video_buffering()
@@ -133,7 +145,6 @@ class DroneVision:
         print("Opening non-blocking readers")
         stderr_reader = NonBlockingStreamReader(self.ffmpeg_process.stderr)
         stdout_reader = NonBlockingStreamReader(self.ffmpeg_process.stdout)
-
 
         # look for success in the stdout
         # If it starts correctly, it will have the following output in the stdout
@@ -144,10 +155,9 @@ class DroneVision:
         # Output file #0 does not contain any stream
 
         success = False
-        while (not success):
-
+        while not success:
             line = stderr_reader.readline()
-            if (line is not None):
+            if line is not None:
                 line_str = line.decode("utf-8")
                 print(line_str)
                 if line_str.find("Stream #0:0 -> #0:0 (h264 (native) -> png (native))") > -1:
@@ -158,7 +168,7 @@ class DroneVision:
                     break
 
             line = stdout_reader.readline()
-            if (line is not None):
+            if line is not None:
                 line_str = line.decode("utf-8")
                 print(line_str)
                 if line_str.find("Output file #0 does not contain any stream") > -1:
@@ -184,7 +194,7 @@ class DroneVision:
         print("starting vision thread")
         self.vision_thread.start()
 
-        if (self.user_vision_thread is not None):
+        if self.user_vision_thread is not None:
             self.user_vision_thread.start()
 
     def _user_callback(self, user_vision_function, user_args):
@@ -196,17 +206,16 @@ class DroneVision:
         :return:
         """
 
-        while (self.vision_running):
-            if (self.new_frame):
+        while self.vision_running:
+            if self.new_frame:
                 user_vision_function(user_args)
 
-                #reset the bit for a new frame
+                # reset the bit for a new frame
                 self.new_frame = False
 
             # put the thread back to sleep for fps
             # sleeping shorter to ensure we stay caught up on frames
             time.sleep(1.0 / (3.0 * self.fps))
-
 
     def _buffer_vision(self, buffer_size):
         """
@@ -222,7 +231,7 @@ class DroneVision:
         # when the method is first called, sometimes there is already data to catch up on
         # so find the latest image in the directory and set the index to that
         found_latest = False
-        while (not found_latest):
+        while not found_latest:
             path = "%s/image_%03d.png" % (self.imagePath, self.image_index)
             if (os.path.exists(path)) and (not os.path.isfile(path)):
                 # just increment through it (don't save any of these first images)
@@ -231,31 +240,31 @@ class DroneVision:
                 found_latest = True
 
         # run forever, trying to grab the latest image
-        while (self.vision_running):
+        while self.vision_running:
             # grab the latest image from the ffmpeg stream
             try:
                 # make the name for the next image
                 path = "%s/image_%03d.png" % (self.imagePath, self.image_index)
                 if (not os.path.exists(path)) and (not os.path.isfile(path)):
-                    #print("File %s doesn't exist" % (path))
-                    #print(os.listdir(self.imagePath))
+                    # print("File %s doesn't exist" % (path))
+                    # print(os.listdir(self.imagePath))
                     continue
 
-                img = cv2.imread(path,1)
+                img = cv2.imread(path, 1)
 
                 # sometimes cv2 returns a None object so skip putting those in the array
-                if (img is not None):
+                if img is not None:
                     self.image_index = self.image_index + 1
 
                     # got a new image, save it to the buffer directly
                     self.buffer_index += 1
                     self.buffer_index %= buffer_size
-                    #print video_frame
+                    # print video_frame
                     self.buffer[self.buffer_index] = img
                     self.new_frame = True
 
             except cv2.error:
-                #Assuming its an empty image, so decrement the index and try again.
+                # Assuming its an empty image, so decrement the index and try again.
                 # print("Trying to read an empty png. Let's wait and try again.")
                 self.image_index = self.image_index - 1
                 continue
@@ -263,7 +272,6 @@ class DroneVision:
             # put the thread back to sleep for faster than fps to ensure we stay on top of the frames
             # coming in from ffmpeg
             time.sleep(1.0 / (2.0 * self.fps))
-
 
     def get_latest_valid_picture(self):
         """
@@ -287,14 +295,12 @@ class DroneVision:
         self.ffmpeg_process.terminate()
         time.sleep(3)
 
-        if (self.ffmpeg_process.poll() is not None):
+        if self.ffmpeg_process.poll() is not None:
             print("Sending a second kill call to the ffmpeg process")
             self.ffmpeg_process.kill()
             self.ffmpeg_process.terminate()
             time.sleep(3)
 
-
         # send the command to kill the vision stream (bebop only)
         if self.model is Model.BEBOP:
             self.drone_object.stop_video_stream()
-

@@ -1,7 +1,6 @@
 from pyparrot.Anafi import Anafi
 from pyparrot.Model import Model
 
-
 if __name__ == "__main__":
     anafi = Anafi(drone_type=Model.ANAFI, ip_address="192.168.42.1")
     print("connecting")

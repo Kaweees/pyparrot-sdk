@@ -25,4 +25,3 @@ If you would like to be added to this list, please email dramymcgovern @ gmail.c
 * `Tech Garage <https://tech-garage.org>`_
 * `St Eugene College <http://www.steugene.qld.edu.au>`_
 * `KIPR/botball <http://www.kipr.org/>`_
-

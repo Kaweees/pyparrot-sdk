@@ -6,10 +6,11 @@ Author: Amy McGovern
 """
 
 import cv2
+from PyQt5.QtGui import QImage
+
 from pyparrot.Bebop import Bebop
 from pyparrot.DroneVisionGUI import DroneVisionGUI
 from pyparrot.Model import Model
-from PyQt5.QtGui import QImage
 
 isAlive = False
 
